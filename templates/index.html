@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Language Translator</title>
+  <!-- Google Font & FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+    integrity="sha512-..."
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <style>
+    :root {
+      --clr-light: #f0f2f6;
+      --clr-dark: #2b2f3a;
+      --bg: var(--clr-light);
+      --card: #ffffff;
+      --text: #333333;
+      --subtext: #666666;
+      --accent: #4a90e2;
+      --accent-dark: #50e3c2;
+      --danger: #e94e77;
+    }
+    body.dark {
+      --bg: var(--clr-dark);
+      --card: #363a47;
+      --text: #e0e0e0;
+      --subtext: #aaaaaa;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family:'Roboto', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height:100vh;
+      display:flex; flex-direction:column;
+      transition: background 0.3s, color 0.3s;
+    }
+    a { text-decoration:none; color:inherit; }
+
+    /* NAVBAR */
+    header {
+      position:sticky; top:0; width:100%;
+      background: var(--card);
+      box-shadow:0 2px 4px rgba(0,0,0,0.1);
+      z-index:1000;
+    }
+    .nav-container {
+      max-width:1200px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0.75rem 1rem;
+    }
+    .logo { font-size:1.5rem; font-weight:700; color:var(--accent); }
+    nav ul { display:flex; list-style:none; }
+    nav li { position:relative; }
+    nav a {
+      padding:0.5rem 1rem;
+      font-weight:500;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: var(--accent); }
+    .dropdown:hover .dropdown-menu {
+      opacity:1; visibility:visible; transform: translateY(0);
+    }
+    .dropdown-menu {
+      position:absolute; top:100%; left:0;
+      background: var(--card); border-radius:4px;
+      box-shadow:0 4px 8px rgba(0,0,0,0.1);
+      list-style:none; overflow:hidden;
+      opacity:0; visibility:hidden;
+      transform: translateY(-10px);
+      transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+    }
+    .dropdown-menu li a {
+      display:block; padding:0.5rem 1rem;
+      white-space:nowrap;
+    }
+    .dropdown-menu li a:hover { background: var(--bg); }
+
+    .theme-toggle {
+      cursor:pointer; font-size:1.25rem; padding:0.5rem;
+      transition: color 0.3s;
+    }
+    .theme-toggle:hover { color: var(--accent); }
+
+    /* MAIN */
+    main {
+      flex:1; display:flex; flex-wrap:wrap;
+      padding:2rem 1rem; gap:2rem; justify-content:center;
+    }
+    .video-wrapper, .translation-panel {
+      background: var(--card);
+      border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+      overflow:hidden;
+      transition: background 0.3s;
+    }
+    .video-wrapper {
+      flex:1; min-width:300px; max-width:600px;
+      position:relative;
+    }
+    .video-wrapper video {
+      width:100%; display:block;
+    }
+    .translation-panel {
+      flex:1; min-width:280px;
+      display:flex; flex-direction:column;
+      padding:1.5rem;
+    }
+    .translation-panel h2 {
+      margin-bottom:1rem; color:var(--accent);
+    }
+    .current-word {
+      font-size:3rem; font-weight:700;
+      color: var(--accent-dark);
+      min-height:3.5rem; opacity:0;
+      transition: opacity 0.3s;
+    }
+    .current-word.show { opacity:1; }
+
+    .history {
+      flex:1; margin-top:1rem; overflow-y:auto;
+    }
+    .history p {
+      background: var(--bg); padding:0.5rem 0.75rem;
+      margin-bottom:0.5rem; border-radius:4px;
+      color:var(--subtext);
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .panel-buttons {
+      display:flex; justify-content:flex-end; gap:0.5rem;
+      margin-top:1rem;
+    }
+    .btn {
+      padding:0.5rem 1rem; border:none; border-radius:4px;
+      cursor:pointer; font-weight:500;
+      transition: background 0.3s;
+    }
+    .btn-clear { background: var(--danger); color:#fff; }
+    .btn-clear:hover { background:#d7375f; }
+    .btn-download { background: var(--accent); color:#fff; }
+    .btn-download:hover { background:#357ab8; }
+
+    /* FOOTER WAVE + CONTENT */
+    .footer-wave {
+      width:100%; height:100px; background: var(--card);
+      clip-path: polygon(0 0, 100% 0, 100% 50%, 0 100%);
+    }
+    footer {
+      background: var(--card);
+      padding:1.5rem 1rem;
+      text-align:center;
+      box-shadow:0 -2px 4px rgba(0,0,0,0.1);
+    }
+    .footer-links, .social-icons {
+      display:flex; justify-content:center; gap:1rem;
+      margin-bottom:0.75rem;
+    }
+    .footer-links a, .social-icons a {
+      color: var(--subtext); font-size:1rem;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover, .social-icons a:hover {
+      color: var(--accent);
+    }
+    footer p { color: var(--subtext); font-size:0.875rem; }
+
+    @media (max-width:900px) {
+      main { flex-direction:column; align-items:center; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity:0; transform: translateX(-10px); }
+      to   { opacity:1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <div class="logo"><i class="fas fa-hand-paper"></i> SignLang AI</div>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="#">Home</a></li>
+          <li class="dropdown">
+            <a href="#">Options <i class="fas fa-caret-down"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="clear-btn">Clear History</a></li>
+              <li><a href="#" id="download-btn">Download Transcript</a></li>
+            </ul>
+          </li>
+          <li><a href="#">About</a></li>
+        </ul>
+      </nav>
+      <div class="theme-toggle" id="theme-toggle"><i class="fas fa-moon"></i></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="video-wrapper">
+      <video id="video" autoplay muted playsinline></video>
+    </div>
+    <div class="translation-panel">
+      <h2>Current Translation</h2>
+      <div id="current-word" class="current-word"></div>
+      <div id="translated-history" class="history"></div>
+      <div class="panel-buttons">
+        <button class="btn btn-clear" id="clear-btn-bottom">Clear</button>
+        <button class="btn btn-download" id="download-btn-bottom">Download</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="footer-wave"></div>
+  <footer>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="social-icons">
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-facebook-f"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+    </div>
+    <p>© 2025 Sign Language Translator. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const video = document.getElementById('video');
+    const currentWordEl = document.getElementById('current-word');
+    const historyEl = document.getElementById('translated-history');
+    const clearBtns = document.querySelectorAll('#clear-btn, #clear-btn-bottom');
+    const downloadBtns = document.querySelectorAll('#download-btn, #download-btn-bottom');
+    const themeToggle = document.getElementById('theme-toggle');
+    let translationWords = [];
+
+    // Webcam setup
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; })
+      .catch(console.error);
+
+    // Send frame every 800ms
+    setInterval(async () => {
+      if (video.readyState < 2) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      canvas.toBlob(async blob => {
+        const form = new FormData(); form.append('frame', blob, 'frame.jpg');
+        try {
+          const res = await fetch('/predict', { method:'POST', body:form });
+          const { prediction } = await res.json();
+          if (prediction) {
+            // update history
+            if (translationWords.slice(-1)[0] !== prediction) {
+              translationWords.push(prediction);
+              const p = document.createElement('p');
+              p.textContent = prediction;
+              historyEl.appendChild(p);
+              historyEl.scrollTop = historyEl.scrollHeight;
+            }
+            // show current
+            currentWordEl.textContent = prediction;
+            currentWordEl.classList.add('show');
+            setTimeout(()=> currentWordEl.classList.remove('show'), 700);
+          }
+        } catch (err) { console.error(err); }
+      }, 'image/jpeg');
+    }, 800);
+
+    // Clear history
+    clearBtns.forEach(btn => btn.addEventListener('click', ()=> {
+      translationWords=[]; historyEl.innerHTML=''; currentWordEl.textContent='';
+    }));
+
+    // Download transcript
+    downloadBtns.forEach(btn => btn.addEventListener('click', ()=> {
+      const blob = new Blob([translationWords.join(' ')], { type:'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'transcript.txt';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }));
+
+    // Theme toggle
+    themeToggle.addEventListener('click', ()=> {
+      document.body.classList.toggle('dark');
+      themeToggle.innerHTML = document.body.classList.contains('dark')
+        ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
+  </script>
+</body>
+</html>
